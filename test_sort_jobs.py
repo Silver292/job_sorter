@@ -9,8 +9,7 @@ class TestSortJobs(unittest.TestCase):
         an empty string should be returned
         """
 
-        job_sorter = JobSorter("")
-        result = job_sorter.sort_jobs()
+        result = JobSorter("").sort_jobs()
         self.assertEqual(result, "")
 
     def test_when_passed_independent_job_should_return_job(self):
@@ -19,8 +18,7 @@ class TestSortJobs(unittest.TestCase):
         the function should return a list containing only the job.
         """
 
-        job_sorter = JobSorter({"a": ""})
-        result = job_sorter.sort_jobs()
+        result = JobSorter({"a": ""}).sort_jobs()
         self.assertEqual(result, ["a"])
 
     def test_multiple_jobs_no_dependencies(self):
@@ -30,8 +28,8 @@ class TestSortJobs(unittest.TestCase):
         """
 
         jobs = {"a": "", "b": "", "c": ""}
-        job_sorter = JobSorter(jobs)
-        result = job_sorter.sort_jobs()
+
+        result = JobSorter(jobs).sort_jobs()
         self.assertCountEqual(result, ["a", "b", "c"])
 
     def test_multiple_jobs_one_dependency(self):
@@ -42,18 +40,12 @@ class TestSortJobs(unittest.TestCase):
         """
 
         jobs = {"a": "", "b": "c", "c": ""}
-        job_sorter = JobSorter(jobs)
-        result = job_sorter.sort_jobs()
+
+        result = JobSorter(jobs).sort_jobs()
 
         # all jobs should be in returned list
         self.assertCountEqual(result, list(jobs.keys()))
-
-        # get subset of job and dependencies
-        expected_subset = ["c", "b"]
-        actual_subset = list(filter(lambda x: x in expected_subset, result))
-
-        # dependent jobs should be after dependencies
-        self.assertEqual(actual_subset, expected_subset)
+        self.assertContainsList(result, ["c", "b"])
 
     def test_multiple_jobs_with_dependencies(self):
         jobs = {"a": "", "b": "c", "c": "f", "d": "a", "e": "b", "f": ""}
@@ -64,15 +56,27 @@ class TestSortJobs(unittest.TestCase):
         # all jobs should be in returned list
         self.assertCountEqual(result, list(jobs.keys()))
 
-        # get subset of job and dependency
-        expected_subset = ["f", "c", "b", "e"]
-        actual_subset = list(filter(lambda x: x in expected_subset, result))
+        # check dependent order
+        self.assertContainsList(result, ["f", "c", "b", "e"])
+        self.assertContainsList(result, ["a", "b"])
 
-        # dependent job should be after dependency
-        self.assertEqual(actual_subset, expected_subset)
+    def test_assertContainsList(self):
+        self.assertContainsList([1, 2, 3], [1, 2, 3])
+        self.assertContainsList(["a", "b", "c"], ["a", "b", "c"])
+        self.assertContainsList([1, 2, 3], [1])
+        self.assertContainsList([1, 2, 3], [2, 3])
+        self.assertContainsList([1, 2, 3], [1, 3])
 
-        expected_subset = ["a", "b"]
-        actual_subset = list(filter(lambda x: x in expected_subset, result))
+        with self.assertRaises(AssertionError):
+            self.assertContainsList([1, 2, 3], [3, 2, 1])
+            self.assertContainsList([1, 2, 3], [2, 1])
+            self.assertContainsList([1, 2, 3], [3, 1])
+            self.assertContainsList([1, 2, 3], ["a", "b"])
+
+    def assertContainsList(self, superset, expected_subset):
+        """ Passes if superset contains items in order of expected subset.
+        """
+        actual_subset = list(filter(lambda x: x in expected_subset, superset))
 
         self.assertEqual(actual_subset, expected_subset)
 
