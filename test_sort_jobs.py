@@ -48,12 +48,34 @@ class TestSortJobs(unittest.TestCase):
         # all jobs should be in returned list
         self.assertCountEqual(result, list(jobs.keys()))
 
-        # get subset of job and dependency
+        # get subset of job and dependencies
         expected_subset = ["c", "b"]
+        actual_subset = list(filter(lambda x: x in expected_subset, result))
+
+        # dependent jobs should be after dependencies
+        self.assertEqual(actual_subset, expected_subset)
+
+    def test_multiple_jobs_with_dependencies(self):
+        jobs = {"a": "", "b": "c", "c": "f", "d": "a", "e": "b", "f": ""}
+
+        job_sorter = JobSorter(jobs)
+        result = job_sorter.sort_jobs()
+
+        # all jobs should be in returned list
+        self.assertCountEqual(result, list(jobs.keys()))
+
+        # get subset of job and dependency
+        expected_subset = ["f", "c", "b", "e"]
         actual_subset = list(filter(lambda x: x in expected_subset, result))
 
         # dependent job should be after dependency
         self.assertEqual(actual_subset, expected_subset)
+
+        expected_subset = ["a", "b"]
+        actual_subset = list(filter(lambda x: x in expected_subset, result))
+
+        self.assertEqual(actual_subset, expected_subset)
+
 
 if __name__ == "__main__":
     unittest.main()

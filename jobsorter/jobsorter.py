@@ -10,23 +10,28 @@ class JobSorter:
         ordered_list = []
 
         for job, dependency in self.job_list.items():
-            # don't add duplicate jobs
             if not dependency and job not in ordered_list:
                 ordered_list.append(job)
-            elif dependency:
-                # get the root dependency, then add the job
-                ordered_list.append(self.get_root_dependency(dependency))
+            elif (
+                dependency
+                and job not in ordered_list
+                and dependency not in ordered_list
+            ):
+                ordered_list.extend(self.get_dependencies(job, []))
+            elif dependency and job not in ordered_list:
                 ordered_list.append(job)
 
         return list(ordered_list)
 
-    def get_root_dependency(self, job):
-        """ Returns root dependency for a job
-        Currently does not return the jobs in between
-        e.g a => b, b => c - when passed a will return c
+    def get_dependencies(self, job, dependencies):
+        """ Returns a list of all dependencies in order 
+        passed job will be the last element. 
+        e.g a => b, b => c - when passed a will return [c,b,a]
         """
         dependency = self.job_list[job]
-        if not dependency:
-            return job
-        else:
-            return self.get_root_dependency(dependency)
+        if dependency:
+            self.get_dependencies(dependency, dependencies)
+
+        dependencies.append(job)
+
+        return dependencies
