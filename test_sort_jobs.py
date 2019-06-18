@@ -9,7 +9,8 @@ class TestSortJobs(unittest.TestCase):
         an empty string should be returned
         """
 
-        result = JobSorter.sort_jobs("")
+        job_sorter = JobSorter("")
+        result = job_sorter.sort_jobs()
         self.assertEqual(result, "")
 
     def test_when_passed_independent_job_should_return_job(self):
@@ -18,7 +19,8 @@ class TestSortJobs(unittest.TestCase):
         the function should return a list containing only the job.
         """
 
-        result = JobSorter.sort_jobs({"a": ""})
+        job_sorter = JobSorter({"a": ""})
+        result = job_sorter.sort_jobs()
         self.assertEqual(result, ["a"])
 
     def test_multiple_jobs_no_dependencies(self):
@@ -28,9 +30,30 @@ class TestSortJobs(unittest.TestCase):
         """
 
         jobs = {"a": "", "b": "", "c": ""}
-        result = JobSorter.sort_jobs(jobs)
+        job_sorter = JobSorter(jobs)
+        result = job_sorter.sort_jobs()
         self.assertCountEqual(result, ["a", "b", "c"])
 
+    def test_multiple_jobs_one_dependency(self):
+        """ Multiple jobs one dependency:
+        When passed multiple jobs, one of which is dependent on
+        another, the dependent job should be after its dependency
+        in the returned list. 
+        """
+
+        jobs = {"a": "", "b": "c", "c": ""}
+        job_sorter = JobSorter(jobs)
+        result = job_sorter.sort_jobs()
+
+        # all jobs should be in returned list
+        self.assertCountEqual(result, list(jobs.keys()))
+
+        # get subset of job and dependency
+        expected_subset = ["c", "b"]
+        actual_subset = list(filter(lambda x: x in expected_subset, result))
+
+        # dependent job should be after dependency
+        self.assertEqual(actual_subset, expected_subset)
 
 if __name__ == "__main__":
     unittest.main()
