@@ -1,5 +1,6 @@
 import unittest
 from jobsorter import JobSorter
+from jobsorter.exceptions import DependencyError
 
 
 class TestSortJobs(unittest.TestCase):
@@ -59,6 +60,14 @@ class TestSortJobs(unittest.TestCase):
         # check dependent order
         self.assertContainsList(result, ["f", "c", "b", "e"])
         self.assertContainsList(result, ["a", "b"])
+
+    def test_jobs_cant_depend_on_themselves(self):
+        """ If passed a job with a dependency on itself
+        the function should throw an error.
+        """
+        
+        jobs = {"a": "", "b": "", "c": "c"}
+        self.assertRaises(DependencyError, JobSorter(jobs).sort_jobs)
 
     def test_assertContainsList(self):
         self.assertContainsList([1, 2, 3], [1, 2, 3])

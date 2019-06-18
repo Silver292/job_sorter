@@ -1,4 +1,5 @@
 from .helpers import UniqueList
+from .exceptions import DependencyError
 
 
 class JobSorter:
@@ -30,6 +31,13 @@ class JobSorter:
         e.g a => b, b => c - when passed a will return [c,b,a]
         """
         dependency = self.job_list[job]
+
+        # job cannot depend on itelf
+        if job == dependency:
+            raise DependencyError(
+                "Jobs cannot depend on themselves", f"{job}:{dependency}"
+            )
+
         if dependency:
             self.get_dependencies(dependency, dependencies)
 
