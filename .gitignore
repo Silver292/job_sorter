@@ -1,6 +1,9 @@
 # ignore virtualenv environment
 .env/
 
+# ignore editor config
+.vscode/
+
 # Python boilerplate .gitignore from 
 # https://raw.githubusercontent.com/github/gitignore/master/Python.gitignore
 
