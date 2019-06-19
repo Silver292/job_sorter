@@ -16,11 +16,8 @@ class JobSorter:
 
         ordered_list = UniqueList()
 
-        for job, dependency in self.job_list.items():
-            if dependency:
-                self.get_dependencies(job, ordered_list)
-            else:
-                ordered_list.append(job)
+        for job in self.job_list.keys():
+            self.get_dependencies(job, ordered_list)
 
         return ordered_list
 
@@ -32,11 +29,7 @@ class JobSorter:
         """
         dependency = self.job_list[job]
 
-        # job cannot depend on itelf
-        if job == dependency:
-            raise DependencyError(
-                "Jobs cannot depend on themselves", f"{job}:{dependency}"
-            )
+        self.checkDependsOnSelf(job, dependency)
 
         if dependency:
             self.get_dependencies(dependency, dependencies)
@@ -44,3 +37,9 @@ class JobSorter:
         dependencies.append(job)
 
         return dependencies
+
+    def checkDependsOnSelf(self, job, dependency):
+        if job == dependency:
+            raise DependencyError(
+                "Jobs cannot depend on themselves", f"{job}:{dependency}"
+            )
