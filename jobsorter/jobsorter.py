@@ -29,7 +29,7 @@ class JobSorter:
         """
         dependency = self.job_list[job]
 
-        self.checkDependsOnSelf(job, dependency)
+        self.check_depends_on_self(job, dependency)
 
         if dependency:
             self.get_dependencies(dependency, dependencies)
@@ -38,7 +38,7 @@ class JobSorter:
 
         return dependencies
 
-    def checkDependsOnSelf(self, job, dependency):
+    def check_depends_on_self(self, job, dependency):
         if job == dependency:
             raise DependencyError(
                 "Jobs cannot depend on themselves", f"{job}:{dependency}"
