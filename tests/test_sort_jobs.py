@@ -65,8 +65,15 @@ class TestSortJobs(unittest.TestCase):
         """ If passed a job with a dependency on itself
         the function should throw an error.
         """
-        
+
         jobs = {"a": "", "b": "", "c": "c"}
+        self.assertRaises(DependencyError, JobSorter(jobs).sort_jobs)
+
+    def test_circular_dependencies(self):
+        """ When passed a job list with circular dependencies
+        the function should return an error.
+        """
+        jobs = {"a": "", "b": "c", "c": "f", "d": "a", "e": "", "f": "b"}
         self.assertRaises(DependencyError, JobSorter(jobs).sort_jobs)
 
     def test_assertContainsList(self):
