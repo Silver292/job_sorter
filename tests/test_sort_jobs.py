@@ -49,6 +49,12 @@ class TestSortJobs(unittest.TestCase):
         self.assertContainsList(result, ["c", "b"])
 
     def test_multiple_jobs_with_dependencies(self):
+        """ Multiple jobs with dependencies:
+        When passed multiple jobs with dependencies, the function
+        should return a list with the jobs in the order they  should
+        be executed. Jobs with dependencies should be after their 
+        dependencies in this list.
+        """
         jobs = {"a": "", "b": "c", "c": "f", "d": "a", "e": "b", "f": ""}
 
         job_sorter = JobSorter(jobs)
